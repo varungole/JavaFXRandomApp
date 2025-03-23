@@ -15,13 +15,14 @@ import javafx.scene.layout.VBox;
 import javafx.util.Builder;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class CustomerViewBuilder implements Builder<Region> {
 
     private final CustomerModel model;
-    private final Runnable saveHandler;
+    private final Consumer<Runnable> saveHandler;
 
-    public CustomerViewBuilder(CustomerModel model, Runnable saveHandler) {
+    public CustomerViewBuilder(CustomerModel model, Consumer<Runnable> saveHandler) {
         this.model = model;
         this.saveHandler = saveHandler;
     }
@@ -38,7 +39,10 @@ public class CustomerViewBuilder implements Builder<Region> {
 
     private Node createButtons() {
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(actionEvent -> saveHandler.run());
+        saveButton.setOnAction(actionEvent -> {
+            saveButton.setDisable(true);
+            saveHandler.accept(() -> saveButton.setDisable(false));
+        });
         HBox results = new HBox(10, saveButton);
         results.setAlignment(Pos.CENTER_RIGHT);
         return results;
